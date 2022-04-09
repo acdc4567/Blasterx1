@@ -5,6 +5,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Weapon/Weapon.h"
+#include "Net/UnrealNetwork.h"
+#include "BlasterComponents/CombatComponent.h"
 
 
 ABlasterChar::ABlasterChar()
@@ -26,7 +30,24 @@ ABlasterChar::ABlasterChar()
 	bUseControllerRotationYaw=0;
 	GetCharacterMovement()->bOrientRotationToMovement=1;
 
+	OverheadWidget=CreateDefaultSubobject<UWidgetComponent>("OverheadWidget");
+	OverheadWidget->SetupAttachment(RootComponent);
+	
+	Combat=CreateDefaultSubobject<UCombatComponent>("CombatComponent");
+	Combat->SetIsReplicated(1);
+
+
 }
+
+
+void ABlasterChar::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ABlasterChar,OverlappingWeapon,COND_OwnerOnly);
+
+
+
+}
+
 
 void ABlasterChar::BeginPlay()
 {
@@ -37,7 +58,7 @@ void ABlasterChar::BeginPlay()
 void ABlasterChar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+    
 }
 
 
@@ -57,6 +78,8 @@ void ABlasterChar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &ABlasterChar::Turn);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &ABlasterChar::LookUp);
+	
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ABlasterChar::EquipButtonPressed);
 	
 }
 
@@ -90,6 +113,63 @@ void ABlasterChar::LookUp(float Value){
 	AddControllerPitchInput(Value*.7f);
 }
 
+void ABlasterChar::OnRep_OverlappingWeapon(AWeapon* LastWeapon){
+	if(OverlappingWeapon){
+		OverlappingWeapon->ShowPickupWidget(1);
+
+	}
+	if(LastWeapon)LastWeapon->ShowPickupWidget(0);
+
+}
+
+void ABlasterChar::SetOverlappingWeapon(AWeapon* Weapon){
+	if (OverlappingWeapon) {
+		OverlappingWeapon->ShowPickupWidget(0);
+	}
+	OverlappingWeapon=Weapon;
+    if (IsLocallyControlled()) {
+        if (OverlappingWeapon) {
+            OverlappingWeapon->ShowPickupWidget(1);
+        }
+    }
+}
+
+
+void ABlasterChar::EquipButtonPressed(){
+	if(Combat){
+		if(HasAuthority()){
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+		else{
+			ServerEquipButtonPressed();
+		}
+		
+
+	}
+}
+
+void ABlasterChar::PostInitializeComponents() {
+	Super::PostInitializeComponents();
+	if(Combat){
+		Combat->Character=this;
+	}
+}
+
+void ABlasterChar::ServerEquipButtonPressed_Implementation(){
+	if(Combat){
+		Combat->EquipWeapon(OverlappingWeapon);
+
+	}
+}
+
+bool ABlasterChar::IsWeaponEquipped(){
+	return (Combat&&Combat->EquippedWeapon);
+	
+}
+
+
+
+
 
 
 
@@ -100,6 +180,13 @@ void ABlasterChar::LookUp(float Value){
 
 
 //
+
+
+
+
+
+
+
 
 
 

@@ -101,7 +101,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful){
         }
         UWorld* World=GetWorld();
         if(World){
-            World->ServerTravel(PathToLobby);
+                World->ServerTravel(PathToLobby);
 
         }
     }

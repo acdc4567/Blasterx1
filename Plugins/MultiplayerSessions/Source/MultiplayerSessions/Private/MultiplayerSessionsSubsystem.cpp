@@ -41,6 +41,14 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections,FSt
     LastSessionSettings->Set(FName("MatchType"),MatchType,EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
     LastSessionSettings->BuildUniqueId=1;
     LastSessionSettings->bUseLobbiesIfAvailable=1;
+    if(IOnlineSubsystem::Get()->GetSubsystemName()=="NULL"){
+
+    }
+    else{
+        if(GEngine){
+            GEngine->AddOnScreenDebugMessage(-1,15.f,FColor::Blue,FString(TEXT("SteamSessionCreatedSuccessfully!")));
+        }
+    }
     const ULocalPlayer* LocalPlayer=GetWorld()->GetFirstLocalPlayerFromController();
     if(!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(),NAME_GameSession,*LastSessionSettings)){
         SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
