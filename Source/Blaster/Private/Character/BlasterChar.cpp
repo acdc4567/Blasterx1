@@ -81,6 +81,11 @@ void ABlasterChar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ABlasterChar::EquipButtonPressed);
 	
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ABlasterChar::CrouchButtonPressed);
+	
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ABlasterChar::AimButtonPressed);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ABlasterChar::AimButtonReleased);
+	
 }
 
 
@@ -148,13 +153,6 @@ void ABlasterChar::EquipButtonPressed(){
 	}
 }
 
-void ABlasterChar::PostInitializeComponents() {
-	Super::PostInitializeComponents();
-	if(Combat){
-		Combat->Character=this;
-	}
-}
-
 void ABlasterChar::ServerEquipButtonPressed_Implementation(){
 	if(Combat){
 		Combat->EquipWeapon(OverlappingWeapon);
@@ -162,11 +160,37 @@ void ABlasterChar::ServerEquipButtonPressed_Implementation(){
 	}
 }
 
+void ABlasterChar::CrouchButtonPressed(){
+	Crouch();
+	
+}
+
+void ABlasterChar::PostInitializeComponents() {
+	Super::PostInitializeComponents();
+	if(Combat){
+		Combat->Character=this;
+	}
+}
+
+
+
 bool ABlasterChar::IsWeaponEquipped(){
 	return (Combat&&Combat->EquippedWeapon);
 	
 }
 
+
+bool ABlasterChar::IsAiming(){
+	return (Combat&&Combat->bAiming);
+}
+
+void ABlasterChar::AimButtonPressed(){
+	if(Combat)Combat->SetAiming(1);
+}
+
+void ABlasterChar::AimButtonReleased(){
+	if(Combat)Combat->SetAiming(0);
+}
 
 
 
