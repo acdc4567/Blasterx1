@@ -73,8 +73,8 @@ void ABlasterChar::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Jumpx", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jumpx", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &ABlasterChar::MoveForward);
-	PlayerInputComponent->BindAxis("Move Right / Left", this, &ABlasterChar::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward / Backward", this, &ABlasterChar::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight / Left", this, &ABlasterChar::MoveRight);
 	
 	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &ABlasterChar::Turn);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &ABlasterChar::LookUp);
