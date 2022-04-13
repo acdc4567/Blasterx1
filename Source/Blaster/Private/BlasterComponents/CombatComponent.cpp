@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -24,7 +25,9 @@ void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	if (Character)	 {
+		Character->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	}
 	
 }
 
@@ -53,19 +56,33 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip){
 
 	}
 	EquippedWeapon->SetOwner(Character);
-	
-
+	Character->GetCharacterMovement()->bOrientRotationToMovement = 0;
+	Character->bUseControllerRotationYaw = 1;
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming){
 	bAiming=bIsAiming;
 	ServerSetAiming(bIsAiming);
+	if (Character) {
+		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
 }
 
-void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming){
-	bAiming=bIsAiming;
-
+void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming) {
+	bAiming = bIsAiming;
+	if (Character) {
+		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
 }
+
+void UCombatComponent::OnRep_EquippedWepon(){
+	if (EquippedWeapon&&Character) {
+		Character->GetCharacterMovement()->bOrientRotationToMovement = 0;
+		Character->bUseControllerRotationYaw = 1;
+	}
+}
+
+
 
 
 

@@ -35,16 +35,22 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void ServerSetAiming(bool bIsAiming);
 	
-
+	UFUNCTION()
+		void OnRep_EquippedWepon();
 private:
 	
 	ABlasterChar* Character;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing= OnRep_EquippedWepon)
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(Replicated)
 	bool bAiming;
+
+	UPROPERTY(EditAnywhere)
+	float BaseWalkSpeed=600.f;
+	UPROPERTY(EditAnywhere)
+	float AimWalkSpeed=300.f;
 
 public:	
 	

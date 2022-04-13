@@ -16,6 +16,7 @@ public class Blaster : ModuleRules
 			,"Blaster/Public/HUD"
 			,"Blaster/Public/Weapon"
 			,"Blaster/Public/BlasterComponents"
+			,"Blaster/Public/BlasterTypes"
 			});
 	
 	}
